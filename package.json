@@ -1,0 +1,18 @@
+{
+  "name": "skir-elixir-client-tests",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test:rpc-parity": "node scripts/rpc-parity.mjs",
+    "test:package": "mix run --no-mix-exs scripts/package-smoke.exs",
+    "test:all": "npm run format:check && npm run test:unit && npm run test:rpc-parity && npm run test:package",
+    "format:check": "prettier --check scripts/*.mjs package.json .prettierrc.json .github/workflows/*.yml && mix format --check-formatted",
+    "format": "prettier --write scripts/*.mjs package.json .prettierrc.json .github/workflows/*.yml && mix format",
+    "test:unit": "mix test --warnings-as-errors"
+  },
+  "devDependencies": {
+    "prettier": "3.9.9",
+    "skir-client": "1.0.19"
+  }
+}

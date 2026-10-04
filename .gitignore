@@ -1,0 +1,11 @@
+/_build/
+/deps/
+/cover/
+/doc/
+/*.ez
+/*.tar
+/erl_crash.dump
+
+/node_modules/
+/.artifacts/
+
