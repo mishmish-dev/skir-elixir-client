@@ -24,7 +24,7 @@ integers and the compact wire syntax is integer-only.
 
 ## Behavior matrix
 
-| Behavior | TypeScript | Dart | Gleam | Elixir client 0.1.0 |
+| Behavior | TypeScript | Dart | Gleam | Elixir client 0.2.0 |
 |---|---|---|---|---|
 | `list`, `studio`, and empty-body keywords | Exact; no trim | Exact; no trim | Trims body | **Exact** |
 | Compact method-number syntax | Strict signed decimal | Strict signed decimal | More permissive | **Strict signed decimal** |

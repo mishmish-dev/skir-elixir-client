@@ -14,7 +14,7 @@ Requires Elixir 1.18+ and Erlang/OTP 27+.
 Add to your application's `mix.exs`, then run `mix deps.get`:
 
 ```elixir
-{:skir_elixir_client, "~> 0.1"}
+{:skir_elixir_client, "~> 0.2"}
 ```
 
 ## Quick example
