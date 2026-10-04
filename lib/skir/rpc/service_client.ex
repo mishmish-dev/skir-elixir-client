@@ -116,7 +116,6 @@ defmodule Skir.RPC.ServiceClient do
            body}
 
         :get ->
-          # TypeScript protects existing percent escapes before assigning URL.search.
           escaped = String.replace(body, "%", "%25")
           query = URI.encode(escaped, &get_query_char?/1)
           {client.service_url <> "?" <> query, headers, ""}
@@ -200,10 +199,8 @@ defmodule Skir.RPC.ServiceClient do
     end)
   end
 
-  # Match WHATWG's special-query percent-encode set used by TypeScript's
-  # `URL.search = ...`: encode controls/non-ASCII plus space, double quote,
-  # hash, single quote, less-than and greater-than. Percent is intentionally
-  # preserved because it has already been doubled above.
+  # Match TypeScript's WHATWG URL.search encoding, not form encoding.
+  # Keep percent escapes: send_request/4 already encodes literal percent signs as %25.
   defp get_query_char?(char)
        when char >= 0x21 and char <= 0x7E and char not in [?", ?#, ?', ?<, ?>],
        do: true

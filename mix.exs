@@ -8,7 +8,7 @@ defmodule Skir.MixProject do
 
     [
       app: :skir_elixir_client,
-      version: "0.2.1",
+      version: "0.2.2",
       elixir: "~> 1.18",
       start_permanent: Mix.env() == :prod,
       deps: [
@@ -26,7 +26,7 @@ defmodule Skir.MixProject do
           "Documentation" => "https://hexdocs.pm/skir_elixir_client"
         },
         licenses: ["MIT"],
-        files: ["lib", "mix.exs", "README.md", "README.dev.md", "docs", "LICENSE"]
+        files: ["lib", "mix.exs", "README.md", "LICENSE"]
       ]
     ]
   end
@@ -36,14 +36,7 @@ defmodule Skir.MixProject do
   defp docs do
     [
       main: "readme",
-      extras: [
-        "README.md",
-        "README.dev.md",
-        "docs/CODECS.md",
-        "docs/SKIRRPC.md",
-        "docs/RELEASING.md",
-        "docs/SKIRRPC_PARITY.md"
-      ],
+      extras: ["README.md"],
       source_ref: "v#{project()[:version]}",
       canonical: "https://hexdocs.pm/skir_elixir_client"
     ]

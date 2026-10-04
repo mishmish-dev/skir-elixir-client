@@ -50,7 +50,6 @@ defmodule Skir.RPC.TypeDescriptor do
     if Map.has_key?(acc, id) do
       acc
     else
-      # Mark the record before descending so recursive schemas terminate.
       acc = Map.put(acc, id, nil)
 
       acc =

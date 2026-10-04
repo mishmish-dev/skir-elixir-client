@@ -52,8 +52,8 @@ defmodule Skir.RPC.HTTPClient.Httpc do
         socket_opts
       end
 
-    # :httpc streaming excludes error responses, and early OTP 27 has no
-    # max_body_size option. Read bounded bodies with OTP's HTTP packet parser.
+    # :httpc cannot bound all response bodies: streaming excludes errors,
+    # and early OTP 27 lacks max_body_size.
     result =
       with {:ok, socket} <-
              transport.connect(
@@ -310,11 +310,12 @@ defmodule Skir.RPC.HTTPClient.Httpc do
     end
   end
 
-  # Discard pending writes so cleanup cannot outlive the request deadline.
-  # SSL close_notify can wait for pending writes even with a zero close timeout.
+  # SSL close_notify can wait for pending writes even with timeout 0;
+  # close asynchronously to avoid extending the request deadline.
   defp close(:ssl, socket), do: spawn(fn -> :ssl.close(socket, 0) end)
 
   defp close(:gen_tcp, socket) do
+    # Discard pending writes so closing cannot extend the request deadline.
     :inet.setopts(socket, linger: {true, 0})
     :gen_tcp.close(socket)
   end

@@ -1,4 +1,3 @@
-# Validate the actual Hex archive without requiring a published package.
 root = File.cwd!()
 artifacts = Path.join(root, ".artifacts/packages")
 File.mkdir_p!(artifacts)

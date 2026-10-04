@@ -22,7 +22,7 @@ defmodule Skir.RPC.Service do
                       {:ok, term()} | {:error, ServiceError.t() | UnknownError.t()})
   @type t :: %__MODULE__{}
 
-  @doc "Creates a service. Options configure unknown fields, error disclosure/logging, Studio, and request size; see the [RPC guide](SKIRRPC.md)."
+  @doc "Creates a service. Options configure unknown fields, error disclosure/logging, Studio, and request size."
   @spec new(keyword()) :: t()
   def new(opts \\ []) when is_list(opts) do
     service = %__MODULE__{
@@ -245,8 +245,6 @@ defmodule Skir.RPC.Service do
       ctx = Skir.Limits.context([max_bytes: service.max_request_bytes], :readable)
       Skir.Limits.json_code(code, ctx)
 
-      # Finite float64 integer literals need at most 309 digits plus a sign.
-      # Bound conversion before constructing arbitrarily large JSON integers.
       case JSON.decode(code, nil, integer: &decode_rpc_integer/1) do
         {value, nil, ""} ->
           Skir.Limits.json_term(value, ctx)
@@ -260,6 +258,8 @@ defmodule Skir.RPC.Service do
     end
   end
 
+  # 310 bytes allow 309 digits plus a sign, covering finite float64 integer values
+  # without letting JSON allocate arbitrarily large integers.
   defp decode_rpc_integer(value) when byte_size(value) <= 310, do: String.to_integer(value)
   defp decode_rpc_integer(_), do: Skir.Error.fail(%{}, :invalid_json, "integer out of range")
 

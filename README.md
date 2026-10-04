@@ -29,10 +29,21 @@ user = User.new(id: 42, name: "Alice")
 {:ok, ^user} = User.decode_json(json)
 ```
 
-## Documentation
+## Development
+
+Set up with:
+
+```sh
+mix local.hex --force
+mix local.rebar --force
+mix deps.get
+npm ci --ignore-scripts
+```
+
+Run `npm run test:all` and `mix docs --warnings-as-errors` to check the runtime
+and build the documentation locally.
+
+## See more
 
 - [Runtime API reference](https://hexdocs.pm/skir_elixir_client)
 - [Generator setup and generated-code guide](https://github.com/mishmish-dev/skir-elixir-gen#readme)
-- [Codecs and schema evolution](docs/CODECS.md)
-- [RPC guide](docs/SKIRRPC.md)
-- [Development](README.dev.md)

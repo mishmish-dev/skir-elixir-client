@@ -3,9 +3,7 @@ defmodule Skir.Binary do
   import Bitwise
   alias Skir.{Error, Limits}
 
-  # This layer handles one value, without the public four-byte "skir" prefix.
-  # Parsed nodes retain their original byte slice so unknown fields round-trip
-  # without changing noncanonical-but-valid encodings or NaN payload bits.
+  # Preserve original bytes so unknown fields retain noncanonical encodings and NaN payload bits.
   def decode_value(bytes, ctx) do
     Limits.bytes(bytes, ctx)
     {node, rest, _remaining} = read(bytes, ctx, ctx.max_nodes)
@@ -106,8 +104,7 @@ defmodule Skir.Binary do
   end
 
   defp write({:raw, bytes, _}, ctx) do
-    # Unknown structs are constructible by application code, so validate before
-    # emitting preserved bytes instead of blindly trusting their provenance.
+    # Applications can construct Unknown structs; preserved bytes may never have been decoded.
     decode_value(bytes, ctx)
     bytes
   end

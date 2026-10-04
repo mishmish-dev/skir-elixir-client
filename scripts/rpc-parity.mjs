@@ -1,11 +1,3 @@
-/**
- * Executable SkirRPC server parity oracle.
- *
- * Requires installed npm dependencies and an Elixir/Mix toolchain. It executes
- * identical raw requests against the official TypeScript Service from
- * `skir-client` and the native Elixir client package's Service, then compares their
- * transport-neutral responses.
- */
 import assert from 'node:assert/strict';
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
@@ -140,8 +132,7 @@ function normalizedResponse(testCase, raw) {
   };
 
   if (testCase.name === 'known method malformed request JSON') {
-    // V8 and JSON report syntax errors differently. Require the same status
-    // and RPC error prefix while allowing the parser-specific diagnostic.
+    // V8 and Elixir JSON produce different syntax-error diagnostics.
     assert.equal(response.status_code, 400);
     assert.match(response.data, /^bad request: can't parse JSON: .+$/);
     response.data = "bad request: can't parse JSON: <parser diagnostic>";
@@ -150,10 +141,7 @@ function normalizedResponse(testCase, raw) {
   if (testCase.body === 'list' && response.status_code === 200) {
     const parsed = JSON.parse(response.data);
     for (const method of parsed.methods ?? []) {
-      // skir-client 1.0.19 currently writes the method name into `number`.
-      // Dart/Gleam and the reflection contract use the numeric ID. Normalize
-      // only that known upstream anomaly so this oracle remains useful after
-      // TypeScript fixes it.
+      // skir-client 1.0.19 writes the method name into `number` instead of the numeric ID.
       if (
         typeof method.number !== 'number' &&
         method.number === method.method

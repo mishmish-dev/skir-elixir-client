@@ -22,7 +22,7 @@ defmodule Skir.Primitive do
 
   def decode(type, input, %{format: :binary} = ctx) do
     node = Binary.semantic(input)
-    # Zero is the universal default-value abbreviation, including strings/bytes.
+
     case node do
       {:number, 0} -> default(type)
       _ -> validate(type, from_binary(type, node, ctx), ctx)
@@ -128,8 +128,7 @@ defmodule Skir.Primitive do
   defp from_json(_, v, _), do: v
 
   defp parse_integer(v, ctx) do
-    # Bound parsing before Integer.parse/1, which otherwise accepts arbitrarily
-    # long strings and trailing characters when its remainder is ignored.
+    # Limit digits before Integer.parse/1 can allocate an arbitrarily large integer.
     if byte_size(v) > 21, do: Error.fail(ctx, :integer_range)
     unless Regex.match?(~r/^-?(0|[1-9][0-9]*)$/, v), do: Error.fail(ctx, :invalid_integer)
 

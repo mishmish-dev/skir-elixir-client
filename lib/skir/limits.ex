@@ -73,8 +73,7 @@ defmodule Skir.Limits do
     n
   end
 
-  # Bound nesting before asking the JSON library to allocate its decoded tree.
-  # This is not a JSON parser: JSON still validates the complete syntax.
+  # Reject excessive nesting before JSON allocates a tree; this scan does not validate syntax.
   def json_code(code, ctx) do
     bytes(code, ctx)
     scan(code, :normal, 0, ctx)
@@ -98,8 +97,6 @@ defmodule Skir.Limits do
 
   defp scan(<<_, rest::binary>>, :normal, depth, ctx), do: scan(rest, :normal, depth, ctx)
 
-  # Bound application-supplied trees before creating their wire representation.
-  # Struct/module metadata is ignored; schema field validation happens in Codec.
   def native_term(term, ctx) do
     native_walk(term, ctx, ctx.max_nodes)
     term

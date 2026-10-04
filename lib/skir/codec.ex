@@ -9,7 +9,6 @@ defmodule Skir.Codec do
   def default({:record, mod}), do: mod.default()
   def default(type) when type in @primitives, do: Primitive.default(type)
 
-  # Return both the representation and default-ness in a single traversal.
   def encode({:optional, _}, nil, ctx), do: {null(ctx), true}
 
   def encode({:optional, type}, value, ctx) do
@@ -150,8 +149,8 @@ defmodule Skir.Codec do
     Limits.collection(map_size(input), ctx)
     ctx = %{ctx | format: :readable}
     known = Map.new(schema.fields, &{&1.json_name, &1})
-    # Start with the generated default, not recursive codec calls. Hard-recursive
-    # defaults use a finite :skir_default sentinel instead of an infinite struct.
+
+    # Generated defaults use :skir_default to terminate hard recursion; recursive decoding would not.
     mod = schema.module
 
     Enum.reduce(input, mod.default(), fn {key, value}, acc ->
@@ -245,7 +244,7 @@ defmodule Skir.Codec do
     ctx = %{ctx | format: actual_format}
 
     cond do
-      # Keep membership out of the inline boolean expression for OTP 27 cover.
+      # Use Enum.member? instead of inline `in` for compatibility with OTP 27 cover.
       Enum.member?([0, "unknown", "UNKNOWN"], tag) and not has_payload ->
         :unknown
 
