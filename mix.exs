@@ -2,13 +2,16 @@ defmodule Skir.MixProject do
   use Mix.Project
 
   def project do
+    if String.to_integer(System.otp_release()) < 27 do
+      raise Mix.Error, message: "skir_elixir_client requires Erlang/OTP 27 or later"
+    end
+
     [
       app: :skir_elixir_client,
       version: "0.1.0",
-      elixir: "~> 1.14",
+      elixir: "~> 1.18",
       start_permanent: Mix.env() == :prod,
       deps: [
-        {:jason, "~> 1.4"},
         {:plug, ">= 1.16.0 and < 2.0.0", only: :test},
         {:ex_doc, "~> 0.40.4", only: :dev, runtime: false}
       ],

@@ -1,7 +1,7 @@
 alias Skir.RPC.Service
 
 [input_path, output_path] = System.argv()
-cases = input_path |> File.read!() |> Jason.decode!()
+cases = input_path |> File.read!() |> JSON.decode!()
 
 string_method = %Skir.Method{
   name: "Echo",
@@ -92,4 +92,4 @@ client_wire = %{
   "POST" => capture_client.(:post)
 }
 
-File.write!(output_path, Jason.encode!(%{"server" => results, "client_wire" => client_wire}))
+File.write!(output_path, JSON.encode!(%{"server" => results, "client_wire" => client_wire}))

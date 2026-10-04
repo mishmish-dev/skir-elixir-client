@@ -18,10 +18,11 @@ mix docs --warnings-as-errors
 
 Open `doc/index.html` for a local documentation preview. ExDoc is a development
 dependency only and is not required by applications using the runtime.
-Building documentation requires Elixir 1.15+; CI uses Elixir 1.20.4 with OTP
-27, 28, and 29. CI builds the documentation and uploads it as a preview artifact.
+The runtime requires Elixir 1.18+ and OTP 27+; CI also tests Elixir 1.20.4
+with OTP 27, 28, and 29. CI builds the documentation and uploads it as a
+preview artifact.
 
-The 44 ExUnit tests cover codecs, validation, RPC services and clients,
+The ExUnit tests cover codecs, validation, RPC services and clients,
 reflection, Studio, and Plug. The raw TypeScript RPC oracle checks 16 server
 cases and GET/POST client wire behavior. CI builds a Hex archive and tests it
 in a fresh Mix consumer. Node dependencies are development-only tools and are

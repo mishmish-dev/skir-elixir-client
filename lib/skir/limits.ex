@@ -74,7 +74,7 @@ defmodule Skir.Limits do
   end
 
   # Bound nesting before asking the JSON library to allocate its decoded tree.
-  # This is not a JSON parser: Jason still validates the complete syntax.
+  # This is not a JSON parser: JSON still validates the complete syntax.
   def json_code(code, ctx) do
     bytes(code, ctx)
     scan(code, :normal, 0, ctx)

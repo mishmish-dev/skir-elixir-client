@@ -34,9 +34,9 @@ defmodule Skir.RPC.TypeDescriptor do
     %{"type" => signature(type), "records" => sorted_records}
   end
 
-  @doc "Returns the type descriptor as an indented UTF-8 JSON string."
+  @doc "Returns the type descriptor as a UTF-8 JSON string."
   @spec to_json(Skir.type()) :: binary()
-  def to_json(type), do: Jason.encode!(to_map(type), pretty: true)
+  def to_json(type), do: JSON.encode!(to_map(type))
 
   defp collect(type, acc) when type in @primitive_types, do: acc
   defp collect({:optional, inner}, acc), do: collect(inner, acc)

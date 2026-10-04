@@ -187,8 +187,8 @@ format is generated from the same schema metadata used by serialization.
 ## Resource limits and errors
 
 The service bounds the raw request body before parsing and runs JSON through
-Skir's nesting/size scanner before passing it to Jason. Decoded request values
-then go through the normal Skir collection/node/type limits. Handler exceptions, throws, and invalid handler returns become unknown HTTP 500
+Skir's nesting/size scanner before passing it to the built-in JSON parser.
+Decoded request values then go through the normal Skir collection/node/type limits. Handler exceptions, throws, and invalid handler returns become unknown HTTP 500
 errors and are hidden unless the service explicitly permits disclosure. Response
 serialization failures are returned as visible server errors, matching the
 current TypeScript and Dart implementations.

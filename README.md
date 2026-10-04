@@ -9,6 +9,8 @@ Supports JSON and binary serialization, SkirRPC, and an optional Phoenix/Plug ad
 
 ## Installation
 
+Requires Elixir 1.18+ and Erlang/OTP 27+.
+
 Add to your application's `mix.exs`, then run `mix deps.get`:
 
 ```elixir

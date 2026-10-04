@@ -46,7 +46,7 @@ defmodule Skir.RPC.PlugTest do
     for resolver <- [service(), fn -> service() end, {__MODULE__, :service, []}] do
       list_conn = conn(:get, "/rpc?list") |> Skir.RPC.Plug.call(service: resolver)
       assert list_conn.status == 200
-      [method] = Jason.decode!(list_conn.resp_body)["methods"]
+      [method] = JSON.decode!(list_conn.resp_body)["methods"]
       assert method["method"] == "Add"
     end
 

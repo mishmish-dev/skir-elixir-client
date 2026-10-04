@@ -58,10 +58,8 @@ defmodule Skir do
       {term, _} = Codec.encode(type, value, ctx)
       Limits.json_term(term, ctx)
 
-      case Jason.encode(term) do
-        {:ok, code} -> Limits.bytes(code, ctx)
-        {:error, _} -> Error.fail(ctx, :invalid_json)
-      end
+      code = JSON.encode!(term)
+      Limits.bytes(code, ctx)
     end)
   end
 
@@ -132,7 +130,7 @@ defmodule Skir do
   defp json_decode(type, code, ctx) do
     Limits.json_code(code, ctx)
 
-    case Jason.decode(code) do
+    case JSON.decode(code) do
       {:ok, term} ->
         Limits.json_term(term, ctx)
         Codec.decode(type, term, ctx)

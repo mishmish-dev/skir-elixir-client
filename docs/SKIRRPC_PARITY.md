@@ -83,8 +83,8 @@ content type, and response body. Cases include:
 
 The `list` response is compared semantically after normalizing the one documented
 TypeScript `number` anomaly. The malformed request JSON case checks the HTTP
-status, content type, and RPC error prefix, allowing V8 and Jason to use their
-own syntax-error diagnostics. All other cases compare the transport-neutral raw
+status, content type, and RPC error prefix, allowing V8 and the built-in JSON
+parser to use their own syntax-error diagnostics. All other cases compare the transport-neutral raw
 response directly.
 
 The oracle is intentionally a hard gate: missing Node dependencies, `mix`, or

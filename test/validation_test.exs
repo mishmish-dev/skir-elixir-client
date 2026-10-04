@@ -24,6 +24,27 @@ defmodule Skir.ValidationTest do
              Skir.from_json(:int32, %{arbitrary_atom: 1})
   end
 
+  test "malformed JSON returns structured errors" do
+    for code <- ["[", "01", "1 trailing", ~s("\\uD800"), <<34, 255, 34>>, "1e9999"] do
+      assert {:error, %Skir.Error{reason: :invalid_json}} = Skir.decode_json(:string, code)
+      assert {:error, %Skir.Error{reason: :invalid_json}} = Skir.decode(:string, code)
+    end
+  end
+
+  test "JSON strings, numbers and null round-trip through the wire codec" do
+    for {type, value} <- [
+          {:string, "hello \"world\"\n\t\\ 🌍"},
+          {:float64, 1.25e-100},
+          {:int64, 9_223_372_036_854_775_807},
+          {:bool, true},
+          {{:optional, :string}, nil}
+        ] do
+      code = Skir.encode_json!(type, value)
+      assert Skir.decode_json!(type, code) == value
+      assert Skir.decode!(type, code) == value
+    end
+  end
+
   test "unknown options and invalid limits are rejected" do
     for opts <- [
           [max_depth: 0],

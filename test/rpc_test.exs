@@ -69,13 +69,13 @@ defmodule Skir.RPCTest do
     raw = Service.handle_request(service(), "RenamedClientMethod:12345::42", %{token: "x"})
     assert raw.status_code == 200
     assert raw.content_type == "application/json"
-    assert Jason.decode!(raw.data) == [42, 0, "Alice"]
+    assert JSON.decode!(raw.data) == [42, 0, "Alice"]
   end
 
   test "colon requests use method name only when the number field is empty" do
     raw = Service.handle_request(service(), "GetUser:::7")
     assert raw.status_code == 200
-    assert Jason.decode!(raw.data) == [7, 0, "Alice"]
+    assert JSON.decode!(raw.data) == [7, 0, "Alice"]
 
     assert %{status_code: 400, data: "bad request: method not found: GetUser; number: 0"} =
              Service.handle_request(service(), "GetUser:0::7")
@@ -86,10 +86,10 @@ defmodule Skir.RPCTest do
 
   test "JSON request form uses readable JSON responses" do
     raw =
-      Service.handle_request(service(), Jason.encode!(%{"method" => "GetUser", "request" => 42}))
+      Service.handle_request(service(), JSON.encode!(%{"method" => "GetUser", "request" => 42}))
 
     assert raw.status_code == 200
-    assert Jason.decode!(raw.data) == %{"id" => 42, "name" => "Alice"}
+    assert JSON.decode!(raw.data) == %{"id" => 42, "name" => "Alice"}
   end
 
   test "malformed and unknown requests have TypeScript/Dart-compatible statuses" do
@@ -136,7 +136,7 @@ defmodule Skir.RPCTest do
              Service.handle_request(svc, "GetUser:::1")
 
     assert %{status_code: 200, data: data} = Service.handle_request(svc, "GetUser:12346::1")
-    assert Jason.decode!(data) == [1, 0, "Other"]
+    assert JSON.decode!(data) == [1, 0, "Other"]
   end
 
   test "endpoint keywords are exact and are not whitespace-trimmed" do
@@ -233,7 +233,7 @@ defmodule Skir.RPCTest do
   test "list endpoint exposes method docs and compatible type descriptors" do
     raw = Service.handle_request(service(), "list")
     assert raw.status_code == 200
-    body = Jason.decode!(raw.data)
+    body = JSON.decode!(raw.data)
     [entry] = body["methods"]
     assert entry["method"] == "GetUser"
     assert entry["number"] == 12_345
@@ -264,7 +264,7 @@ defmodule Skir.RPCTest do
     end
   end
 
-  test "JSON nesting is bounded before Jason allocates the request tree" do
+  test "JSON nesting is bounded before JSON allocates the request tree" do
     nested = String.duplicate("[", 65) <> "0" <> String.duplicate("]", 65)
 
     assert %{status_code: 400, data: data} =
@@ -451,7 +451,7 @@ defmodule Skir.RPCTest do
         |> Service.add_method(echo, fn request, _ -> {:ok, request} end)
 
       raw = Service.handle_request(svc, "GetUser:12345::[1,0,\"A\",\"future\"]")
-      assert Jason.decode!(raw.data) == if(keep, do: [1, 0, "A", "future"], else: [1, 0, "A"])
+      assert JSON.decode!(raw.data) == if(keep, do: [1, 0, "A", "future"], else: [1, 0, "A"])
     end
 
     html =
@@ -491,7 +491,7 @@ defmodule Skir.RPCTest do
 
     for body <- [~s({"method":12345,"request":7}), "GetUser:12345:readable:7"] do
       assert %{status_code: 200, data: json} = Service.handle_request(service(), body)
-      assert Jason.decode!(json) == %{"id" => 7, "name" => "Alice"}
+      assert JSON.decode!(json) == %{"id" => 7, "name" => "Alice"}
     end
 
     nested = String.duplicate("[", 65) <> "0" <> String.duplicate("]", 65)

@@ -236,7 +236,7 @@ defmodule Skir.RPC.Service do
       ctx = Skir.Limits.context([max_bytes: service.max_request_bytes], :readable)
       Skir.Limits.json_code(code, ctx)
 
-      case Jason.decode(code) do
+      case JSON.decode(code) do
         {:ok, value} ->
           Skir.Limits.json_term(value, ctx)
           {:ok, value}
@@ -396,7 +396,7 @@ defmodule Skir.RPC.Service do
     %RawResponse{
       status_code: 200,
       content_type: "application/json",
-      data: Jason.encode!(%{"methods" => methods}, pretty: true)
+      data: JSON.encode!(%{"methods" => methods})
     }
   end
 
