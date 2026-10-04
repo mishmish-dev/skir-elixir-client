@@ -141,15 +141,21 @@ GET passes the percent-decoded query string to `Service.handle_request/3`.
 client =
   Skir.RPC.ServiceClient.new!("https://api.example.com/rpc",
     headers: [{"authorization", "Bearer ..."}],
-    transport_opts: [timeout: 15_000, connect_timeout: 5_000]
+    transport_opts: [timeout: 15_000, connect_timeout: 5_000, max_response_bytes: 4_194_304]
   )
 
 {:ok, user} = AccountsSkir.get_user(client, 42)
 user = AccountsSkir.get_user!(client, 42)
 ```
 
-The built-in transport uses OTP `:httpc` with peer verification for HTTPS. For
-Req, Finch, Tesla, Mint, or application-specific instrumentation, implement
+The built-in transport uses OTP TCP/TLS sockets and its HTTP header parser, with
+peer verification for HTTPS. It bounds response bodies while receiving them,
+including chunked and non-2xx responses. `max_response_bytes` defaults to
+4,194,304 and must be a positive integer; set it in `transport_opts` or per call.
+An oversized response becomes a status-0 RPC error. The timeout bounds each
+invocation, including redirects. The adapter follows at most five redirects
+and strips sensitive headers when the origin changes. For Req, Finch, Tesla,
+Mint, or application-specific instrumentation, implement
 `c:Skir.RPC.HTTPClient.request/5` and pass the module as `transport:`. An arity-5
 function is also accepted, which makes client tests inexpensive.
 
@@ -173,6 +179,9 @@ Client RPC errors are `%Skir.RPC.RpcError{status_code: code, message: message}`.
 Status `0` means the HTTP request failed or a successful HTTP response could not
 be decoded. For non-2xx HTTP responses, the client exposes the response body only
 when its content type is `text/plain`, matching SkirRPC's error-surface rule.
+At most the first 1,024 body bytes are copied into the error message; longer
+bodies end with `... (truncated)`. This also applies to custom transports, which
+must enforce their own response allocation limits while receiving data.
 
 ## Studio and reflection
 
@@ -188,7 +197,13 @@ format is generated from the same schema metadata used by serialization.
 
 The service bounds the raw request body before parsing and runs JSON through
 Skir's nesting/size scanner before passing it to the built-in JSON parser.
-Decoded request values then go through the normal Skir collection/node/type limits. Handler exceptions, throws, and invalid handler returns become unknown HTTP 500
+Numeric method IDs must be in the uint32 range (0 through 4,294,967,295).
+Compact method-number tokens have at most ten decimal digits. Manual JSON
+requests bound integer tokens to 310 bytes before conversion, enough for all Skir
+integers and finite float64 values written as integer literals. Method IDs are
+then range-checked before lookup or rendering. Decoded request values go through
+the normal Skir collection/node/type limits. Handler exceptions, throws, and
+invalid handler returns become unknown HTTP 500
 errors and are hidden unless the service explicitly permits disclosure. Response
 serialization failures are returned as visible server errors, matching the
 current TypeScript and Dart implementations.

@@ -8,7 +8,7 @@ defmodule Skir.MixProject do
 
     [
       app: :skir_elixir_client,
-      version: "0.2.0",
+      version: "0.2.1",
       elixir: "~> 1.18",
       start_permanent: Mix.env() == :prod,
       deps: [
@@ -39,6 +39,7 @@ defmodule Skir.MixProject do
       extras: [
         "README.md",
         "README.dev.md",
+        "docs/CODECS.md",
         "docs/SKIRRPC.md",
         "docs/RELEASING.md",
         "docs/SKIRRPC_PARITY.md"

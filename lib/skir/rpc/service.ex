@@ -158,7 +158,12 @@ defmodule Skir.RPC.Service do
   end
 
   defp parse_json_method(value) when is_binary(value), do: {:ok, {value, nil}}
-  defp parse_json_method(value) when is_integer(value), do: {:ok, {"?", value}}
+
+  defp parse_json_method(value) when is_integer(value) and value >= 0 and value <= 0xFFFFFFFF,
+    do: {:ok, {"?", value}}
+
+  defp parse_json_method(value) when is_integer(value),
+    do: {:error, text(400, "bad request: method number out of uint32 range")}
 
   defp parse_json_method(_),
     do: {:error, text(400, "bad request: 'method' field must be a string or an integer")}
@@ -182,8 +187,12 @@ defmodule Skir.RPC.Service do
   defp parse_method_number(""), do: {:ok, nil}
 
   defp parse_method_number(value) do
-    if Regex.match?(~r/^-?[0-9]+$/, value) do
-      {:ok, String.to_integer(value)}
+    if byte_size(value) <= 11 and Regex.match?(~r/^-?[0-9]{1,10}$/, value) do
+      number = String.to_integer(value)
+
+      if number >= 0 and number <= 0xFFFFFFFF,
+        do: {:ok, number},
+        else: {:error, text(400, "bad request: method number out of uint32 range")}
     else
       {:error, text(400, "bad request: can't parse method number")}
     end
@@ -236,18 +245,23 @@ defmodule Skir.RPC.Service do
       ctx = Skir.Limits.context([max_bytes: service.max_request_bytes], :readable)
       Skir.Limits.json_code(code, ctx)
 
-      case JSON.decode(code) do
-        {:ok, value} ->
+      # Finite float64 integer literals need at most 309 digits plus a sign.
+      # Bound conversion before constructing arbitrarily large JSON integers.
+      case JSON.decode(code, nil, integer: &decode_rpc_integer/1) do
+        {value, nil, ""} ->
           Skir.Limits.json_term(value, ctx)
           {:ok, value}
 
-        {:error, _} ->
+        _ ->
           {:error, :invalid_json}
       end
     rescue
       _error in Skir.Error -> {:error, :invalid_json}
     end
   end
+
+  defp decode_rpc_integer(value) when byte_size(value) <= 310, do: String.to_integer(value)
+  defp decode_rpc_integer(_), do: Skir.Error.fail(%{}, :invalid_json, "integer out of range")
 
   defp invoke_entry_from_term(service, entry, request_value, mode, metadata) do
     unknown_fields = if service.keep_unrecognized_values, do: :preserve, else: :discard

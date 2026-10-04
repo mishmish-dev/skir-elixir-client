@@ -23,7 +23,7 @@ with OTP 27, 28, and 29. CI builds the documentation and uploads it as a
 preview artifact.
 
 The ExUnit tests cover codecs, validation, RPC services and clients,
-reflection, Studio, and Plug. The raw TypeScript RPC oracle checks 16 server
+reflection, Studio, Plug, and bounded live HTTP response handling. The raw TypeScript RPC oracle checks 16 server
 cases and GET/POST client wire behavior. CI builds a Hex archive and tests it
 in a fresh Mix consumer. Node dependencies are development-only tools and are
 not required by the runtime or included in Hex.

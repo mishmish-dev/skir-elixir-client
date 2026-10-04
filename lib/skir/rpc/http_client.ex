@@ -3,7 +3,7 @@ defmodule Skir.RPC.HTTPClient do
   Transport behaviour used by `Skir.RPC.ServiceClient`.
 
   Implement this behaviour to use Finch, Req, Tesla, Mint, or another HTTP
-  stack. The built-in adapter uses OTP `:httpc`.
+  stack. The built-in adapter uses bounded OTP TCP/TLS reads and its HTTP header parser.
   """
 
   @type header :: {String.t(), String.t()}

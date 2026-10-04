@@ -33,5 +33,6 @@ user = User.new(id: 42, name: "Alice")
 
 - [Runtime API reference](https://hexdocs.pm/skir_elixir_client)
 - [Generator setup and generated-code guide](https://github.com/mishmish-dev/skir-elixir-gen#readme)
+- [Codecs and schema evolution](docs/CODECS.md)
 - [RPC guide](docs/SKIRRPC.md)
 - [Development](README.dev.md)

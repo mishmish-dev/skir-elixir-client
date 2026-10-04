@@ -22,6 +22,17 @@ any JavaScript number in the manual JSON envelope's `method` field, whereas Dart
 requires an integer method ID. Elixir follows Dart here because Skir method IDs are
 integers and the compact wire syntax is integer-only.
 
+## Resource-limit changes in 0.2.1
+
+Valid SkirRPC requests retain the behavior recorded below. Numeric method IDs
+are now restricted to uint32, compact tokens to ten digits, and manual JSON
+integer tokens to 310 bytes before conversion (including finite float64 integer
+literals). These bounds deliberately
+reject oversized or out-of-range input rather than echoing arbitrary integers.
+The default HTTP transport bounds responses during receipt, including HTTP
+errors, and error text is clipped to a 1,024-byte excerpt. See the
+[RPC guide](SKIRRPC.md) for configuration.
+
 ## Behavior matrix
 
 | Behavior | TypeScript | Dart | Gleam | Elixir client 0.2.0 |

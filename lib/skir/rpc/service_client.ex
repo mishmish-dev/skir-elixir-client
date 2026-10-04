@@ -3,6 +3,8 @@ defmodule Skir.RPC.ServiceClient do
 
   alias Skir.RPC.RpcError
 
+  @max_error_body_bytes 1024
+
   @enforce_keys [:service_url, :headers, :transport]
   defstruct [:service_url, :headers, :transport, :transport_opts]
 
@@ -167,8 +169,22 @@ defmodule Skir.RPC.ServiceClient do
   end
 
   defp handle_response(_method, %{status: status, headers: headers, body: body}) do
-    suffix = if text_plain?(headers), do: ": " <> body, else: ""
+    suffix = if text_plain?(headers), do: ": " <> error_body(body), else: ""
     {:error, rpc_error(status, "HTTP status #{status}" <> suffix)}
+  end
+
+  defp error_body(body) when byte_size(body) <= @max_error_body_bytes, do: body
+
+  defp error_body(body) do
+    prefix = binary_part(body, 0, @max_error_body_bytes)
+
+    prefix =
+      case :unicode.characters_to_binary(prefix) do
+        {:incomplete, complete, _} -> complete
+        _ -> prefix
+      end
+
+    prefix <> "... (truncated)"
   end
 
   defp text_plain?(headers) do
